@@ -22,8 +22,6 @@ RUN /bin/bash -c "cd /node-ws && source /opt/ros/kinetic/setup.bash && catkin_ma
 
 RUN /bin/bash -c "source /node-ws/devel/setup.bash"
 
-RUN ["chmod","+x","/node-ws/node_launch.sh"]
-
 RUN [ "cross-build-end" ]
 
 WORKDIR /node-ws
