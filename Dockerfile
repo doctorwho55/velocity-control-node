@@ -26,4 +26,4 @@ RUN [ "cross-build-end" ]
 
 WORKDIR /node-ws
 
-CMD [ "sudo /node-ws/node_launch.sh" ]
+CMD [ "/node-ws/node_launch.sh" ]
