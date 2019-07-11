@@ -26,4 +26,5 @@ RUN [ "cross-build-end" ]
 
 WORKDIR /node-ws
 
+RUN ["chmod","+x","/node-ws/node_launch.sh"]
 CMD [ "/node-ws/node_launch.sh" ]
