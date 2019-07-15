@@ -1,8 +1,10 @@
 <launch>
+    <arg name="veh" doc="Name of vehicle. ex: duckiebot"/>
 	<node name="vel_func_node" pkg="vel_func_node" type="vel_func_node.py" output="screen">
 		<!-- Setup parameters -->
+        <param name="~veh" value="$(arg veh)"/>
 		<!-- Remapping topics -->
-		<remap from="commanded_velocity" to="/duckiebot02/car_cmd_switch_node/cmd"/>
 		<!-- <remap from="~topic_b" to="talker/topic_a"/> -->
+		<!-- <remap from="~vel_cmd" to="/duckiebot02/car_cmd_switch_node/cmd"/> -->
 	</node>
 </launch>
