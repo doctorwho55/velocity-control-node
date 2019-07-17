@@ -1,66 +1,87 @@
 #!/usr/bin/env python
+
+# Import rospy and sys
 import rospy
 import sys
 
+# Import Twist2DStamped from duckietown_msgs
 from duckietown_msgs.msg import Twist2DStamped
+
 
 class VelocityFunction():
 
     def __init__(self):
-        # Initiate named node
+        # Initialize vel_func_node node
         rospy.init_node('vel_func_node', anonymous=False)
 
+        # Set hostname based on optional ~veh argument
         if len(sys.argv) != 2:
-            print("Vehicle name not passed as a command line argument, expected to be passed as ROS variable")
+            rospy.loginfo(
+                "Vehicle name not passed as a command line argument, expected to be passed as ROS variable")
             try:
                 self.hostname = rospy.get_param("~veh")
             except:
                 raise Exception("ROS parameter '~veh' not found!")
         else:
             self.hostname = sys.argv[1]
-
-        print('Hostname: %s' % self.hostname)
+        rospy.loginfo('Hostname: %s' % self.hostname)
 
         # Instruct user on how to stop node
         rospy.loginfo("Use CTRL + C to stop node")
 
-        # Function to call when ctrl + c is issued
-        rospy.on_shutdown(self.shutdown)
-
         # Create Publisher object
         # pub = rospy.Publisher('/'+host+'/vel_func_node/car_cmd',Twist2DStamped,queue_size=1)
-        self.pub = rospy.Publisher('/'+self.hostname+'/joy_mapper_node/car_cmd',Twist2DStamped,queue_size=1)
+        self.pub = rospy.Publisher(
+            '/'+self.hostname+'/joy_mapper_node/car_cmd', Twist2DStamped, queue_size=1)
 
-        # Create variable of message type Twist2DStamped
+        # Create message type duckietown/Twist2DStamped
         self.msg = Twist2DStamped()
 
-        # Set publish velocity rate
-        self.rate = rospy.Rate(10) # 10hz
+        # Set publish rate
+        self.rate = rospy.Rate(10)  # 10hz
+
+        # Set shutdown function to call when CTRL + C is pressed
+        self.rate.sleep()
+        rospy.on_shutdown(self.shutdown)
 
     def send_cmd(self):
+        # Populate message to move forward
+        self.msg.header.stamp = rospy.Time.now()
+        self.msg.v = 0.1
+        self.msg.omega = 0.0
+
+        # Publish velocity message
         self.pub.publish(self.msg)
 
     def shutdown(self):
-        print("Shutdown Initiated: Stopping motors")
-        rospy.loginfo("Shutdown velocity function command")
+        # Log beginning of shutdown hook
+        rospy.loginfo("Shutdown: Initiated, stopping motors")
 
+        # Populate message to stop motion
         self.msg = Twist2DStamped()
         self.msg.header.stamp = rospy.Time.now()
         self.msg.v = 0.0
         self.msg.omega = 0.0
-        
+
+        # Publish motion stop message
         self.pub.publish(self.msg)
-        
         rospy.sleep(1)
+
+        # Log end of shutdown hook
+        rospy.loginfo("Shutdown: Motors stopped")
 
 
 if __name__ == '__main__':
 
     try:
+        # Instantiate VelocityFunction object
         controller = VelocityFunction()
+
         while not rospy.is_shutdown():
+            # Send velocity command at specified rate
             controller.send_cmd()
             controller.rate.sleep()
-    except rospy.ROSInterruptException:
-	    raise Exception("Error encountered when attempting to start vel_func_node velPublisher!")
 
+    except rospy.ROSInterruptException:
+        raise Exception(
+            "Error encountered when attempting to start vel_func_node velPublisher!")
