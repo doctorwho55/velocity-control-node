@@ -26,23 +26,22 @@ class VelocityFunction():
             self.hostname = sys.argv[1]
         rospy.loginfo('Hostname: %s' % self.hostname)
 
-        # Instruct user on how to stop node
-        rospy.loginfo("Use CTRL + C to stop node")
-
         # Create Publisher object
-        # pub = rospy.Publisher('/'+host+'/vel_func_node/car_cmd',Twist2DStamped,queue_size=1)
         self.pub = rospy.Publisher(
             '/'+self.hostname+'/joy_mapper_node/car_cmd', Twist2DStamped, queue_size=1)
+        rospy.loginfo("Initialized publisher")
 
-        # Create message type duckietown/Twist2DStamped
+        # Create message of type duckietown/Twist2DStamped
         self.msg = Twist2DStamped()
 
         # Set publish rate
         self.rate = rospy.Rate(10)  # 10hz
 
         # Set shutdown function to call when CTRL + C is pressed
-        self.rate.sleep()
         rospy.on_shutdown(self.shutdown)
+
+        # Instruct user on how to stop node
+        rospy.loginfo("Use CTRL + C to stop node")
 
     def send_cmd(self):
         # Populate message to move forward
@@ -55,7 +54,7 @@ class VelocityFunction():
 
     def shutdown(self):
         # Log beginning of shutdown hook
-        rospy.loginfo("Shutdown: Initiated, stopping motors")
+        rospy.loginfo("Shutdown initiated, stopping motors")
 
         # Populate message to stop motion
         self.msg = Twist2DStamped()
