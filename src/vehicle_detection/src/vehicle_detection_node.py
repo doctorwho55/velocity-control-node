@@ -77,6 +77,7 @@ class VehicleDetectionNode(object):
 	def cbImage(self, image_msg):
 		if not self.active:
 			return
+		rospy.logwarn('cbImage function entered') # TODO: Remove
 		# Start a daemon thread to process the image
 		thread = threading.Thread(target=self.processImage,args=(image_msg,))
 		thread.setDaemon(True)

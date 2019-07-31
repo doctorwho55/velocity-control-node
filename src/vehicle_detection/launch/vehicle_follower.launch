@@ -1,0 +1,35 @@
+<launch>
+	<arg name="config" default="baseline"/>
+    <arg name="veh" doc="Name of vehicle. ex: megaman"/>
+	<arg name="param_file_name" default="default" doc="Specify a param file. ex:megaman"/>
+    <arg name="pkg_name" value="vehicle_detection"/>
+
+    <group ns="$(arg veh)">        
+        <!-- Vehicle Detection Node -->
+        <node  name="vehicle_detection_node" pkg="$(arg pkg_name)" type="vehicle_detection_node.py" output="screen" clear_params="true" required="true">
+			<rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name)/vehicle_detection_node/$(arg param_file_name).yaml"/>
+            <remap from="~image" to="/$(arg veh)/camera_node/image/compressed"/>
+		</node>
+
+        <!-- Vehicle Filter Node -->
+        <node  name="vehicle_filter_node" pkg="$(arg pkg_name)" type="vehicle_filter_node.py" output="screen" clear_params="true" required="true">
+			<rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name)/vehicle_filter_node/$(arg param_file_name).yaml"/>
+            <remap from="~corners" to="/$(arg veh)/vehicle_detection_node/corners"/>
+            <remap from="~camera_info" to="/$(arg veh)/camera_node/camera_info"/>
+		</node>
+        
+        <!-- Vehicle Avoidance Control Node -->
+        <node  name="vehicle_avoidance_control_node" pkg="$(arg pkg_name)" type="vehicle_avoidance_control_node.py" output="screen" clear_params="true" required="true">
+			<rosparam command="load" file="$(find duckietown)/config/$(arg config)/$(arg pkg_name)/vehicle_avoidance_control_node/$(arg param_file_name).yaml"/>
+            <remap from="~car_cmd_in" to="/$(arg veh)/joy_mapper_node/car_cmd"/>
+            <remap from="~detection" to="/$(arg veh)/vehicle_detection_node/detection"/>
+            <remap from="~vehicle_pose" to="/$(arg veh)/vehicle_filter_node/pose"/>
+        </node>
+    </group>
+
+    <!-- Publications -->
+
+    <!-- Subscriptions -->
+
+</launch>
+followed
