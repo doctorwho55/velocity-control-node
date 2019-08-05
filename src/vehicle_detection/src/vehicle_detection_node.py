@@ -28,7 +28,7 @@ class VehicleDetectionNode(object):
 				"/config/" + self.config + \
 				"/vehicle_detection/vehicle_detection_node/" +  \
 				self.cali_file_name + ".yaml"
-		if not os.path.isfile(self.cali_file):
+		if not os.path.isfile (self.cali_file):
 			rospy.logwarn("[%s] Can't find calibration file: %s.\n" 
 					% (self.node_name, self.cali_file))
 		self.loadConfig(self.cali_file)
