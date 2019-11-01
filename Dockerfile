@@ -6,8 +6,13 @@ LABEL maintainer="Aleksandar Petrov alpetrov@student.ethz.ch"
 # ROS_MASTER_URI - the hostname and port of the roscore master, typically http://hostname:11311 - ALWAYS REQUIRED! 
 # DUCKIEBOT_NAME - the hostname of the Duckiebot, e.g. duckiebot
 
-
 RUN [ "cross-build-start" ]
+
+COPY requirements.txt /requirements.txt
+
+# otherwise installation of Picamera fails https://github.com/resin-io-projects/resin-rpi-python-picamera/issues/8
+ENV READTHEDOCS True
+RUN pip install -r /requirements.txt
 
 RUN mkdir /node-ws 
 
